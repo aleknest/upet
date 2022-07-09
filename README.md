@@ -1,5 +1,5 @@
 # upet
 
-[![Watch the video]](https://youtu.be/TzqmmsEU7xE)
+[Watch the video](https://youtu.be/TzqmmsEU7xE)
 
 
