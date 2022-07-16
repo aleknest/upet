@@ -1,4 +1,4 @@
-threads=4
+threads=3
 PROJ='upet.scad'
 EX='/home/aleknest/applications/openscad/openscad '$PROJ
 

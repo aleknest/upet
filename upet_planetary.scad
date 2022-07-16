@@ -8,6 +8,7 @@ use <../_utils_v2/fillet.scad>
 use <../_utils_v2/m3-m8.scad>
 
 include <config.scad>
+include <report.scad>
 
 modul = 1;
 outer_diameter=9;
@@ -184,13 +185,20 @@ module planetary_carrier_cut(offs=0)
 	}
 }
 
-module planetary_carrier_fix()
+module planetary_carrier_fix(report=false)
 {
 	h=10;
 	translate ([0,0,planetary_carrier_cut_z[0]+planetary_carrier_cut_z[1]/2])
 	rotate ([90,0,0])
 	translate ([0,0,-h/2])
 	{
+		if (report)
+		{
+			report_m3(screw=h);
+			report_m3_washer();
+			report_m3_hexnut();
+		}
+		
 		m3_screw(h=h);
 		m3_washer();
 		translate ([0,0,h-2])
@@ -207,7 +215,7 @@ module planetary_carrier_bottom()
 	{
 		planetary_carrier(top=false);
 		planetary_carrier_cut(offs=0.1);
-		planetary_carrier_fix();
+		planetary_carrier_fix(report=true);
 	}
 }
 
@@ -269,10 +277,17 @@ module planetary_sun()
 				{
 					for (a=[180])
 					rotate ([0,0,a])
+					{
 						m3_screw(h=screw,cap_side_out=10);
+						report_m3(screw=screw);
+						report_m3_washer();
+					}
 					rotate ([0,0,90])
 					translate ([0,0,screw-4])
-						m3_square_nut(offs=0.4,offsv=0.2);//555555
+					{
+						m3_square_nut(offs=0.4,offsv=0.2);
+						report_m3_squarenut();
+					}
 				}
 		}
 	}

@@ -1,0 +1,28 @@
+
+    100K NTC 3950 Thermistor
+    4020 slot: 145mm
+    685 bearing
+    DIN 6798A washer
+    Heater Cartridge 12V 40W 6*20mm
+    Led power supply MN-100W12V, size 175*53*21mm, https://www.aliexpress.com/item/1005002290063769.html
+    M3 nut (hex), 7 pcs
+    M3 nut (thin square), 6 pcs
+    M3 t-slot nut, 2 pcs
+    M3 washer, 15 pcs
+    M3x10 DIN912, 11 pcs
+    M3x30 DIN912, 2 pcs
+    M3x35 DIN912, 4 pcs
+    M3x6 DIN912, 2 pcs
+    M4 washer, 2 pcs
+    M5 nut, 8 pcs
+    M5 t-slot nut, 4 pcs
+    M5 washer, 13 pcs
+    M5x10 DIN912, 8 pcs
+    M5x16 bolt, 2 pcs
+    M5x16 DIN912
+    M5x20 DIN912, 6 pcs
+    M5x30 bolt
+    M6x10 or M6x12 bolt
+    Nema 17 motor
+    optical switch
+    Volcano heatblock

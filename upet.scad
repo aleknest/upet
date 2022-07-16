@@ -10,6 +10,7 @@ use <../_utils_v2/fillet.scad>
 use <../_utils_v2/m3-m8.scad>
 
 include <config.scad>
+include <report.scad>
 use <upet_planetary.scad>
 
 gear_big_cut_offsd=2;
@@ -42,6 +43,7 @@ module proto_slot4020_cr(length)
 	translate ([0,0,-50])
 	rotate ([90,0,90])
 		import ("proto/40x20x100VSlotExtrusion.stl");
+	report_slot(h=length);
 }
 
 module proto_pet_volcano()
@@ -49,6 +51,22 @@ module proto_pet_volcano()
 	translate ([31,44,3.12])
 	rotate ([180,90,90])
 		import ("proto/pet_volcano.stl");
+	
+	report ("Volcano heatblock");
+	report ("Heater Cartridge 12V 40W 6*20mm");
+	report ("100K NTC 3950 Thermistor");
+	report ("M6x10 or M6x12 bolt");
+
+	report_m3(screw=30);
+	report_m3(screw=30);
+	report_m3_slot_nut();
+	report_m3_slot_nut();
+	report_m3_washer();
+	report_m3_washer();
+	report_m4_washer();
+	report_m4_washer();
+	report_m5_washer();
+	report_m5_washer();
 }
 
 module proto_slot()
@@ -68,6 +86,7 @@ module proto()
 	rotate_small_gear()
 	translate_rotate (motor_tr)
 		NEMA(NEMA17ali, shaft_angle = 0, jst_connector = false);
+	report_nema17();
 		
 	proto_slot();
 }
@@ -146,7 +165,7 @@ module cylinder_bevel_outer(d,bevel,fn)
 gear_cut=[gear_big_d-10,gear_big_h-4];
 fil_rays=10;
 
-module gear_big_fix(add=false,part="")
+module gear_big_fix(add=false,part="",report=false)
 {
 	screw=10;
 	rays=3;
@@ -249,7 +268,7 @@ module gear_big_fix(add=false,part="")
 				translate ([0,0,-0.2])
 				translate ([0,0,screw-nutdiff])
 				rotate([0,0,90])
-					m3_nut(h=protect);
+					m3_nut(h=protect);			
 			}
 			else
 			{
@@ -260,6 +279,13 @@ module gear_big_fix(add=false,part="")
 				translate (p[0])
 				rotate (p[1])
 				{
+					if (report)
+					{
+						report_m3_hexnut();
+						report_m3(screw=screw);
+						report_m3_washer();
+					}
+					
 					m3_screw(h=screw+2);
 					m3_washer();
 					
@@ -277,7 +303,7 @@ module gear_big_fix(add=false,part="")
 	}
 }
 
-module gear_big(part="")
+module gear_big(part="",report=false)
 {
 	rr=body_dim[1]/2-(body_dim[1]-body_dim[0])/4;
 	washer_fix_hh=4;
@@ -395,6 +421,13 @@ module gear_big(part="")
 			translate ([0,-rr,body_dim[2]+body_dim[4]+0.01])
 			rotate ([180,0,0])
 			{
+				if (report)
+				{
+					report_m5_bolt(screw=16);
+					report_m5_nut();
+					report_m5_washer();
+					report ("DIN 6798A washer");
+				}
 				cylinder(d=m5_screw_diameter(),h=filament_fix_screw+6,$fn=40);
 				translate ([0,0,filament_fix_screw-m5_nut_H()-2])
 				{
@@ -409,7 +442,7 @@ module gear_big(part="")
 								cylinder(d=m5_washer_diameter(),h=washer_fix_hh,$fn=60);
 				}
 			}
-			gear_big_fix(part=part);
+			gear_big_fix(part=part,report=report);
 		}
 		
 		translate ([0,0,washer_fix_hh+0.2])
@@ -464,7 +497,7 @@ module gear_big_middle()
 {
 	difference()
 	{
-		gear_big(part="middle");
+		gear_big(part="middle",report=true);
 		gear_big_parted(op=0);
 		gear_big_parted(op=1);
 	}
@@ -600,6 +633,9 @@ module motor_plate()
 				*/
 			}
 			
+			report ("685 bearing");
+			report_m5_screw_only(screw=16);
+			
 			rotate_small_gear()
 			translate_rotate(small_gear_fix_tr)
 			translate ([-motor_out,0,0])
@@ -644,10 +680,12 @@ module motor_plate()
 					{
 						m3_screw(h=10,cap_out=10);
 						m3_washer();
+						report_m3(screw=35);
+						report_m3_washer();
 					}
 			}
 			
-			spool_axis_fix(down=down_fix);
+			spool_axis_fix(down=down_fix,report=true);
 		}
 		spool_axis_fix_add(down=down_fix);
 	}
@@ -656,7 +694,7 @@ module motor_plate()
 spool_axis_fix_nut=16;
 spool_axis_fix_rays=6;
 
-module spool_axis_fix(down=0)
+module spool_axis_fix(down=0,nuts=true,report=false)
 {
 	translate ([0,0,down])
 	translate_rotate (spool_axis_tr)
@@ -670,6 +708,11 @@ module spool_axis_fix(down=0)
 				,spool_axis[3]-gear_big_h/2-m5_cap_h()])
 			rotate ([180,0,0])
 			{
+				if (report)
+				{
+					report_m5_screw(screw=20);
+					report_m5_nut();
+				}
 				m5n_screw_washer(thickness=40,washer_out=20);
 				translate([0,0,spool_axis_fix_nut])
 				rotate ([0,0,90])
@@ -719,7 +762,7 @@ module spool_axis()
 	}
 }
 
-module stand()
+module stand(nuts=false)
 {
 	slot_cur=20;//slot;
 	points=polyRound([
@@ -770,85 +813,23 @@ module stand()
 					
 			offs=14;
 			for (x=[-stand[0]/2+offs,stand[0]/2-offs])
-			for (y=[-10,-30])
+			for (y=[-10/*,-30*/])
 			translate ([x,y,4-stand_slot_th-stand_zadd])
 			translate (stand_tr[0])
 			rotate ([180,0,0])
+			{
 				m5n_screw_washer(thickness=40,washer_out=20);
+				report_m5_point();
+			}
 			
 			translate ([0,0-stand[4],0])
-				spool_axis_fix();
+				spool_axis_fix(report=nuts);
 		}
 		translate ([0,0-stand[4],0])
 			spool_axis_fix_add();
 	}
 }
 
-/*
-//wrong
-module volcano_fix()
-{
-	difference()
-	{
-		translate (volcano_fix_tr)
-		{
-			//dim=[volcano_fix_dim.x+bracket_outer[0]*2,volcano_fix_dim.y,volcano_fix_dim.z];
-			cube (volcano_fix_dim);
-	
-			w=12;
-			h=8;
-			translate ([(volcano_fix_dim.x-w)/2,-h+0.01,0])
-				cube ([w,h,volcano_fix_dim.z]);
-			
-			translate ([-bracket_outer[0]+0.01,-bracket_outer[1],0])
-				cube ([bracket_outer[0],volcano_fix_dim.y+bracket_outer[1],volcano_fix_dim.z]);
-			
-			translate ([volcano_fix_dim.x-0.01,-bracket_outer[1],0])
-				cube ([bracket_outer[0],volcano_fix_dim.y+bracket_outer[1],volcano_fix_dim.z]);
-		}
-		
-		translate ([volcano_fix_tr.x+volcano_fix_dim.x/2,volcano_tr.y,volcano_tr.z])
-		{
-			for (i=[-1,1])
-				translate ([6*i,-5.4,0])
-				rotate ([-90,0,0])
-				{
-					hh=volcano_fix_screw+2;
-					m3_screw(h=hh);
-					
-					translate([0,0,volcano_fix_screw-3])
-					rotate ([0,0,180])
-						m3_square_nut(offs=0.4);
-				}
-		}
-		
-		for (b=bracket_tr)
-			translate_rotate (b)	
-				for (a=[[0,0],[-90,1]])
-				rotate ([0,a[0],0])
-				mirror([0,0,a[1]])
-				{
-					translate ([3,0,10])
-					rotate ([0,-90,0])
-					{
-						screw=16;
-						m5_screw(h=screw);
-						translate ([0,0,screw-4])
-							m5_nut(h=20);
-					}
-					for (x=[2.5,17.5])
-						translate ([x,0,0])
-						rotate ([0,180,0])
-							hull()
-							{
-								for (j=[-1,1])
-								translate ([0,1*j,-1])
-									cylinder (d=2,h=2.5,$fn=20);
-							}
-				}
-	}
-}
-*/
 module endstop_flag()
 {
 	tube_corr=[0,8,4];
@@ -896,6 +877,7 @@ module endstop_flag()
 		rotate ([-90,0,0])
 		translate ([0,0,-10])
 			cylinder (d=4.9,h=60,$fn=80);
+		report_m5_bolt(screw=30);
 	}
 }
 
@@ -986,6 +968,7 @@ module endstop_base()
 			}
 		}
 	
+		report_optical_switch();
 		endstopcut();
 		endstop_fix_screw();
 		
@@ -1069,7 +1052,10 @@ module endstop_fix()
 					for (x=[-out_screw,endstop_dim.x+out_screw])
 						translate ([x,10+endstop_back,pdim.z])
 						rotate ([0,180,0])
-							m5n_screw_washer(thickness=pdim.z,washer_out=0,washer_spere=true);//00000000
+						{
+							m5n_screw_washer(thickness=pdim.z,washer_out=0,washer_spere=true);
+							report_m5_point();
+						}
 					
 					translate ([th,-1,4])
 						cube ([fdim.x-th*2,fdim.y+2,fdim.z-4-th]);
@@ -1143,7 +1129,10 @@ module power_to_slot(dim,add=false,sgn=1,screw_offset=0)
 			for (y=[-10,10])
 				translate ([-4,y+power_to_slot_out/2*sgn,10])
 				rotate ([0,90,0])
+				{
 					m5n_screw_washer(thickness=6,washer_out=20);
+					report_m5_screw_only(screw=10);
+				}
 			
 			for (y=[-screwt[1]/2,screwt[1]/2])
 				translate ([-screwt[2]+screw_offset,y+power_to_slot_out/2*sgn,screwt[0]])
@@ -1158,6 +1147,8 @@ module power_to_slot(dim,add=false,sgn=1,screw_offset=0)
 					}
 					rotate ([0,0,90])
 						m3_square_nut(offs=0.4,offsv=0.2);
+					report_m3(screw=10);
+					report_m3_squarenut();
 				}
 		}
 		if (add)
@@ -1320,6 +1311,9 @@ module slot_right()
 			translate ([0,out,4])
 			rotate ([0,0,90])
 				nut(G=9.4,H=m5_nut_H());
+			
+			report_m5_bolt(screw=16);
+			report_m5_nut();
 		}
 
 		translate ([power_to_slot_right_dim.x*2-power_to_slot_right_x,power_to_slot_right_dim.y/2+0.01,-0.01])
@@ -1375,10 +1369,10 @@ module spool_bottom()
 			],20));
 		translate ([0,0,spool_dim[2]-spool_bearing[1]])
 		{
+			report ("608 bearing");
 			cut=1;
 			dd=spool_bearing[0];
 			hh=spool_bearing[1]+0.01;
-			echo (dd);
 			cylinder (d=dd,h=hh,$fn=60);
 			translate ([0,0,hh-cut])
 				cylinder (d1=dd,d2=dd+cut,h=cut,$fn=60);
@@ -1445,6 +1439,9 @@ module spool_top(part=0)
 			screw=20;
 			translate ([0,0,-hh])
 			{
+				report_m3_hexnut();
+				report_m3_washer();
+				report_m3(screw=screw);
 				m3_screw(h=screw);
 				translate ([0,0,screw+-3-5])
 				{
@@ -1554,6 +1551,12 @@ module printer_filament_case(op=0)
 				translate ([0,-20,0])
 				rotate ([0,0,90])
 					m5_nut();
+			}
+			
+			if (op==0)
+			{
+				report_m5_nut();
+				report_m5_bolt(screw=16);
 			}
 		}
 		
@@ -2178,18 +2181,6 @@ if (cmd=="main/gear_big_bottom")
 if (cmd=="main/gear_big_middle")
 	rotate ([-90,0,0])
 		gear_big_middle();
-/*
-if (cmd=="main/spool_axis_spacer_1mm")
-{
-	rotate ([90,0,0])
-	spool_axis_spacer(hh=1);
-}
-if (cmd=="main/spool_axis_spacer_2mm")
-{
-	rotate ([90,0,0])
-	spool_axis_spacer(hh=2);
-}
-*/
 if (cmd=="main/endstop")
 	rotate ([0,0,0])
 	union()
@@ -2271,6 +2262,51 @@ if (cmd=="display/encoder_knob")
 	rotate ([0,0,0])
 		encoder_knob();
 
+if (cmd=="report_machine")
+{
+	report("Led power supply MN-100W12V, size 175*53*21mm, https://www.aliexpress.com/item/1005002290063769.html");
+	proto();
+	stand();
+	motor_plate();
+	spool_axis();
+	slot_left();
+	slot_right();
+	
+	rotate([0,0,180])
+	{
+		endstop_base();
+		endstop_fix();
+		endstop_flag();
+	}
+
+	gear_big_bottom();
+	gear_big_middle();
+	gear_big_top();
+
+	planetary_sun();
+	planetary_body();
+	planetary_satellite();
+	planetary_carrier_bottom();
+	planetary_carrier_top();
+	planetary_carrier();
+	planetary_top();
+}
+if (cmd=="report_printer")
+{
+	printer_filament_case();
+	printer_filament_case(op=1);
+	spool_axis();
+	stand(nuts=true);
+}
+
+if (cmd=="report_spool")
+{
+	spool_bottom();
+	spool_top(part=0);
+	spool_top(part=1);
+	spool_washer();
+}
+
 if (cmd=="")
 {
 	if (false)
@@ -2289,13 +2325,11 @@ if (cmd=="")
 			endstop_fix();
 			endstop_flag();
 		}
-		/*
-		// wrong
-		volcano_fix();
-		*/
-		//power_to_slot();
+		slot_left();
+		slot_right();
+		
 		//screw_cap();
-		printer_filament_case();
+		//printer_filament_case();
 	}
 	else
 	{
@@ -2304,7 +2338,7 @@ if (cmd=="")
 		//screw_cap();
 		//motor_plate();
 		//gear_big_bottom();
-		//gear_big_middle();
+		gear_big_middle();
 		//gear_big_top();
 		
 		//spool_bottom();
@@ -2329,6 +2363,6 @@ if (cmd=="")
 //		display_box(part="top");
 //		display_box(part="plate");
 
-		encoder_knob();
+//		encoder_knob();
 	}
 }
