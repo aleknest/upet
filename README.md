@@ -1,6 +1,6 @@
 # upet
 
-[Watch the video](https://youtu.be/OY4By4eS6UQ)
+[Відео роботи верстата](https://youtu.be/OY4By4eS6UQ)
 
 [Список комплектуючих верстата](./bom/bom_machine.txt).
 
