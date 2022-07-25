@@ -2338,7 +2338,7 @@ if (cmd=="")
 		//screw_cap();
 		//motor_plate();
 		//gear_big_bottom();
-		gear_big_middle();
+		//gear_big_middle();
 		//gear_big_top();
 		
 		//spool_bottom();
@@ -2360,8 +2360,8 @@ if (cmd=="")
 //		board_box(part="bottom");
 //		board_box(part="top");
 
-//		display_box(part="top");
-//		display_box(part="plate");
+		display_box(part="top");
+		display_box(part="plate");
 
 //		encoder_knob();
 	}
