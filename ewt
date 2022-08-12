@@ -1,0 +1,21 @@
+Orientation detector config</ssf:Name><adi:Position X="0" Y="0" Z="1000"/>
+<adi:deviationXY enabled="false">
+	<adi:Left>5000</adi:Left>
+	<adi:Right>5000</adi:Right>
+</adi:deviationXY>
+<adi:deviationYZ enabled="true">
+	<adi:Left>5000</adi:Left>
+	<adi:Right>5000</adi:Right>
+</adi:deviationYZ>
+<adi:deviationXZ enabled="true">
+	<adi:Left>5000</adi:Left>
+	<adi:Right>5000</adi:Right>
+</adi:deviationXZ>
+
+X - XY
+Y - YZ
+Z - XZ
+
+atan2(Y,X)
+
+position

@@ -341,7 +341,7 @@ module gear_big(part="",report=false)
 				
 				union()
 				{
-					hh=2;
+					hh=body_dim[4];
 					dhh=body_dim[4]-hh;
 					
 					translate ([0,0,body_dim[2]-body_dim[4]])
@@ -1931,7 +1931,7 @@ module encoder(op)
 	{
 		translate ([0,0,-0.1])
 			cylinder (d=15,h=4.1,$fn=80);
-		translate ([0,0,4+0.3])
+		translate ([0,0,0])
 			cylinder (d=7.5,h=10,$fn=80);
 		
 		cut=[2.5,1.01,1.1];
@@ -1942,6 +1942,7 @@ module encoder(op)
 }
 
 //x,y,thickness box,down,thickness inner,up
+/*
 display=[80-15,40,0,25-10,2.4,0];
 yy_display=display[1]+display[2];
 alpha_display=acos(display[3]/(sqrt(yy_display*yy_display+display[3]*display[3])));
@@ -2051,7 +2052,7 @@ module display_box(part="")
 		cut_parts(offs=0);
 	}
 }
-
+*/
 module encoder_knob_body(d,h)
 {
 	r=4;
@@ -2115,6 +2116,90 @@ module encoder_knob()
 	}
 }
 
+//x,y,thickness box,down,thickness inner,up
+display2=[80-15,22,0,25-10,2.4,0];
+//yy_display=display[1]+display[2];
+//alpha_display=acos(display[3]/(sqrt(yy_display*yy_display+display[3]*display[3])));
+module display_box2(part="")
+{
+	tr_oled=[21-15/2,display2[1],-device_bottom/2];
+	rot_oled=[90,0,180];
+	tr_encoder=[-21+15/2,display2[1],-device_bottom/2];
+	rot_encoder=[90,0,0];
+
+	screw_x=21;
+	screw3=6;
+
+	ears=16;
+	r=3;
+	function points_ears(x)=[
+		 [-x/2-ears,0,r]
+		,[x/2+ears,0,r]
+		,[x/2+ears,-20,r]
+		,[-x/2-ears,-20,r]
+	];
+	th=4;
+	
+	union()
+	{
+		difference()
+		{
+			union()
+			{
+				difference()
+				{
+					union()
+					{
+						translate ([-display2[0]/2,0,-device_bottom])
+							cube ([display2[0],display2[1],device_bottom]);
+						translate ([0,-device_back-display2[2]+th,0])
+						translate ([-display2[0]/2,0,-20])
+							cube ([display2[0],display2[1],20]);
+						
+						difference()
+						{
+							translate ([0,-device_back-display2[2]+th,0])
+							rotate ([90,0,0])
+							linear_extrude(th)
+								polygon(polyRound(points_ears(display2[0]),1));
+							
+							translate ([0,-device_back-display2[2]+4,0])
+							for (xx=[-1,1])
+								translate ([(display2[0]/2+ears-8)*xx,0,-10])
+								rotate ([90,0,0])
+									m5n_screw_washer(thickness=4,washer_out=10);
+						}						
+					}
+					translate ([-display2[0]/2+display2[4],-40-display2[4],-device_bottom+display2[4]])
+						cube ([display2[0]-display2[4]*2,display2[1]+40,device_bottom-display2[4]*2]);
+
+					
+					translate ([0,10,-20])
+					rotate ([0,90,0])
+						cylinder (d=12,h=100,$fn=80);
+				}
+				translate (tr_oled)
+				rotate (rot_oled)
+				translate ([0,0,-display2[4]])
+					oled(op=1,thickness=display2[4]);
+	
+				translate (tr_encoder)
+				rotate (rot_encoder)
+					encoder(op=1);
+			}
+			
+			translate (tr_oled)
+			rotate (rot_oled)
+			translate ([0,0,-display2[4]])
+				oled(op=2,thickness=display2[4]);
+	
+			translate (tr_encoder)
+			rotate (rot_encoder)
+				encoder(op=2);
+		}
+	}
+}
+
 module list(s)
 {
 	echo(str("list:",s));
@@ -2124,8 +2209,12 @@ if (cmd=="list")
 	list("board/bottom");
 	list("board/top");
 	list("board/plate");
+	
+	/*
 	list("display/top");
 	list("display/plate");
+	*/
+	list("display/box");
 	list("display/encoder_knob");
 	
 	list("printer/filament_case");
@@ -2252,12 +2341,17 @@ if (cmd=="board/top")
 if (cmd=="board/plate")
 	rotate ([90,0,0])
 		board_box(part="plate");
+/*
 if (cmd=="display/top")
 	rotate ([-alpha_display+270,0,0])
 		display_box(part="top");
 if (cmd=="display/plate")
 	rotate ([90,0,0])
 		display_box(part="plate");
+*/
+if (cmd=="display/box")
+	rotate ([90,0,0])
+		display_box2();
 if (cmd=="display/encoder_knob")
 	rotate ([0,0,0])
 		encoder_knob();
@@ -2339,7 +2433,7 @@ if (cmd=="")
 		//motor_plate();
 		//gear_big_bottom();
 		//gear_big_middle();
-		//gear_big_top();
+		gear_big_top();
 		
 		//spool_bottom();
 		//spool_top(part=0);
@@ -2360,8 +2454,10 @@ if (cmd=="")
 //		board_box(part="bottom");
 //		board_box(part="top");
 
-		display_box(part="top");
-		display_box(part="plate");
+//		display_box(part="top");
+//		display_box(part="plate");
+
+//		display_box2();
 
 //		encoder_knob();
 	}
